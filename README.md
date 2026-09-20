@@ -86,6 +86,7 @@ Current patches:
 |---|---|
 | Platynator | LibRangeCheck finds no range spells on Forever, so the range checker is nil and nameplates with out-of-range fade or range colour rules throw. Treats "no checker" as in range. |
 | Baganator | Blizzard's Forever `BankFrame.lua` calls `C_Bank.FetchNumPurchasedBankTabs(nil)` when Baganator's bank UI is in use (no Blizzard bank tab selected). Re-registers the callback with a nil guard. |
+| NoAutoClose | Its secure Esc handler is disabled on Forever (the client's restricted environment is broken), and the fallback pushes the protected `PlayerSpellsFrame` into `UISpecialFrames` despite its own blacklist. Esc in combat then throws `ADDON_ACTION_BLOCKED ... PlayerSpellsFrame:Hide()` blamed on a random addon. The patch leaves that frame to Blizzard. |
 
 Retired (fixed upstream): Auctionator crafting-orders page (337), Baganator auctionable
 check (827), Leatrix Plus Pet Journal hooks (1.60.03).

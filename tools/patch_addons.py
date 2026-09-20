@@ -21,6 +21,12 @@ Patches:
       passes that nil to C_Bank.FetchNumPurchasedBankTabs and throws. Re-register the
       callback with a nil guard.
   (Baganator IsAuctionable patch removed: fixed upstream in 827, 2026-09-19.)
+  NoAutoClose NoAutoclose.lua
+      NoAutoClose blacklists PlayerSpellsFrame from UISpecialFrames (unsafe: protected
+      frame) and normally uses a secure Esc handler instead. On Forever that handler is
+      disabled ("RE is dead") and the fallback inserts the frame anyway. Esc in combat
+      then blocks PlayerSpellsFrame:Hide() from a tainted loop and blames a random
+      addon (Chattynator, AtlasLoot, WhatsTraining...). Leave the frame to Blizzard.
 """
 import os
 import sys
@@ -89,6 +95,17 @@ if addonTable.Constants.IsForever and BankFrame and BankFrameMixin and BankFrame
     end
   end, BankFrame)
 end
+""",
+    },
+    {
+        "addon": "NoAutoClose",
+        "file": "NoAutoclose.lua",
+        "old": """local is4E = toc >= 16000 and toc < 20000
+""",
+        "new": """local is4E = toc >= 16000 and toc < 20000
+-- forever-addon-kit patch: without the secure esc handler (disabled on Forever) the
+-- blacklisted PlayerSpellsFrame would be pushed into UISpecialFrames; leave it to Blizzard.
+if is4E then ns.ignore.PlayerSpellsFrame = true; end
 """,
     },
 ]
