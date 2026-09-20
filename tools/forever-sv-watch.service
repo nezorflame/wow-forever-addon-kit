@@ -1,0 +1,21 @@
+# systemd user unit for the SavedVariables bridge watcher (Linux).
+# Install:
+#   cp tools/forever-sv-watch.service ~/.config/systemd/user/
+#   systemctl --user daemon-reload
+#   systemctl --user enable --now forever-sv-watch.service
+# Adjust the path in ExecStart if the repo is not in ~/Git/wow-forever-addon-kit.
+# Paths to the game come from forever.env in the repo root.
+
+[Unit]
+Description=WoW Forever beta SavedVariables bridge (wow-forever-addon-kit)
+Documentation=https://github.com/nezorflame/wow-forever-addon-kit
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/python3 %h/Git/wow-forever-addon-kit/tools/sv_bridge.py watch
+Restart=on-failure
+RestartSec=5
+Nice=10
+
+[Install]
+WantedBy=default.target

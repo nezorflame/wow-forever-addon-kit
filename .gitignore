@@ -1,0 +1,16 @@
+# Machine-specific configuration (paths, account folder)
+forever.env
+
+# Personal addon settings captured by the bridge
+addons/ForeverCompat/seeds/*.lua
+sv-backups/
+
+# Runtime output
+tools/sv_bridge.log
+tools/memwatch.csv
+tools/gxlogs/
+tools/sv_watch.lock
+
+# Python
+__pycache__/
+*.pyc
