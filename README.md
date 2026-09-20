@@ -49,7 +49,9 @@ systemctl --user enable --now forever-sv-watch.service
 ```
 
 Requirements: Python 3.10+, `inotify-tools` (falls back to polling without it), `luac`
-(optional, validates saves before copying). In game, enable "Load out of date AddOns".
+(optional, validates saves before copying). The loader addon targets interface `16001`, so
+"Load out of date AddOns" is not needed for it; only for third-party addons whose TOC
+does not list `16001` yet.
 
 Windows: see [docs/WINDOWS.md](docs/WINDOWS.md).
 

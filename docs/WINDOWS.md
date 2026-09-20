@@ -69,7 +69,8 @@ author fixed it upstream, so that patch can be dropped.
 
 ## 6. In-game
 
-- Interface → AddOns → tick "Load out of date AddOns" (or `/console checkAddonVersion 0`).
+- The loader addon targets interface `16001`, so "Load out of date AddOns" is not needed
+  for it. Tick it only for a third-party addon whose TOC does not list `16001` yet.
 - Seeds are re-read on `/reload`; a brand-new addon's seed needs a client restart once
   (the client only sees files that existed at launch; placeholders cover this after the
   first run).
