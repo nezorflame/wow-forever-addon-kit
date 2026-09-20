@@ -27,6 +27,11 @@ Patches:
       disabled ("RE is dead") and the fallback inserts the frame anyway. Esc in combat
       then blocks PlayerSpellsFrame:Hide() from a tainted loop and blames a random
       addon (Chattynator, AtlasLoot, WhatsTraining...). Leave the frame to Blizzard.
+  SimpleItemLevel addon.lua (2 patches)
+      Forever's Blizzard_InspectUI replaced the global InspectPaperDollFrame_UpdateButtons
+      with the mixin method InspectPaperDollFrame:UpdateButtons(). Retail live still has
+      the global, so the addon calls/hooks it unconditionally -> nil call on inspect.
+      Use whichever exists.
 """
 import os
 import sys
@@ -106,6 +111,31 @@ end
 -- forever-addon-kit patch: without the secure esc handler (disabled on Forever) the
 -- blacklisted PlayerSpellsFrame would be pushed into UISpecialFrames; leave it to Blizzard.
 if is4E then ns.ignore.PlayerSpellsFrame = true; end
+""",
+    },
+    {
+        "addon": "SimpleItemLevel",
+        "file": "addon.lua",
+        "old": """                InspectPaperDollFrame_UpdateButtons()
+""",
+        "new": """                -- forever-addon-kit patch: Forever's InspectUI moved this to a mixin method
+                if InspectPaperDollFrame_UpdateButtons then
+                    InspectPaperDollFrame_UpdateButtons()
+                elseif InspectPaperDollFrame and InspectPaperDollFrame.UpdateButtons then
+                    InspectPaperDollFrame:UpdateButtons()
+                end
+""",
+    },
+    {
+        "addon": "SimpleItemLevel",
+        "file": "addon.lua",
+        "old": """    hooksecurefunc("InspectPaperDollFrame_UpdateButtons", function()
+""",
+        "new": """    -- forever-addon-kit patch: Forever's InspectUI moved this to a mixin method
+    local hookInspectUpdateButtons = InspectPaperDollFrame_UpdateButtons
+        and function(fn) hooksecurefunc("InspectPaperDollFrame_UpdateButtons", fn) end
+        or function(fn) hooksecurefunc(InspectPaperDollFrame, "UpdateButtons", fn) end
+    hookInspectUpdateButtons(function()
 """,
     },
 ]
