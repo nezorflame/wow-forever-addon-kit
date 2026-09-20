@@ -228,7 +228,7 @@ def write_addon():
     for name in ("Compat.lua", "ActionPlace.lua"):
         shutil.copyfile(os.path.join(COMPAT_SRC, name), os.path.join(COMPAT_DST, name))
     seeds = sorted(f for f in os.listdir(SEEDS) if f.lower().endswith(".lua"))
-    toc = TOC.format(seeds="\n".join("seeds\\" + s for s in seeds))
+    toc = TOC.format(seeds="\n".join("seeds/" + s for s in seeds))
     tmp = os.path.join(COMPAT_DST, "!!ForeverCompat.toc.tmp")
     with open(tmp, "w", encoding="ascii", newline="\r\n") as f:
         f.write(toc)
