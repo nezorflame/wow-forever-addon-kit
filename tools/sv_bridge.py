@@ -40,6 +40,15 @@ import time
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 PROJECT = os.path.dirname(HERE)
+LOG = os.path.join(HERE, "sv_bridge.log")
+
+
+def log(msg):
+    line = time.strftime("%Y-%m-%d %H:%M:%S ") + msg
+    if sys.stdout:  # pythonw.exe has no console
+        print(line, flush=True)
+    with open(LOG, "a", encoding="utf-8") as f:
+        f.write(line + "\n")
 
 
 def load_env_file():
@@ -82,8 +91,10 @@ def detect_account():
     cands = hashed or cands
     if len(cands) == 1:
         return cands[0]
-    sys.exit(f"cannot pick the WTF account folder in {root}: {cands or 'none found'}; "
-             "log in once, or set FOREVER_ACCOUNT=<folder name>")
+    msg = (f"cannot pick the WTF account folder in {root}: {cands or 'none found'}; "
+           "log in once, or set FOREVER_ACCOUNT=<folder name> (env or forever.env)")
+    log("FATAL: " + msg)
+    sys.exit(msg)
 
 
 ACCOUNT = detect_account()
@@ -93,8 +104,6 @@ COMPAT_SRC = os.path.join(PROJECT, "addons", "ForeverCompat")
 COMPAT_DST = os.path.join(BETA, "Interface", "AddOns", "!!ForeverCompat")
 SEEDS = os.path.join(COMPAT_DST, "seeds")
 BACKUPS = os.path.join(PROJECT, "sv-backups")
-LOG = os.path.join(HERE, "sv_bridge.log")
-
 ADDONS = os.path.join(BETA, "Interface", "AddOns")
 # Never bridged: our own loader and Blizzard's addons (the client handles those).
 EXCLUDE = {"!!ForeverCompat"}
@@ -197,13 +206,6 @@ ActionPlace.lua
 """
 
 LUAC = shutil.which("luac") or shutil.which("luac5.4")
-
-
-def log(msg):
-    line = time.strftime("%Y-%m-%d %H:%M:%S ") + msg
-    print(line, flush=True)
-    with open(LOG, "a", encoding="utf-8") as f:
-        f.write(line + "\n")
 
 
 def valid_lua(path):
@@ -410,4 +412,11 @@ def main(argv):
 
 
 if __name__ == "__main__":
-    main(sys.argv[1:])
+    try:
+        main(sys.argv[1:])
+    except SystemExit:
+        raise
+    except Exception:  # noqa: BLE001
+        import traceback
+        log("FATAL: " + traceback.format_exc().strip().replace("\n", " | "))
+        raise

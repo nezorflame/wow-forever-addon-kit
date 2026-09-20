@@ -4,6 +4,10 @@ The scripts in `tools/` run unchanged on Windows. They cover two things: the
 SavedVariables bridge (the beta client never reads settings back) and the addon
 source patches for Forever. `memwatch.sh` is Linux-only.
 
+All commands below are for **PowerShell**. In cmd.exe, write `%LOCALAPPDATA%`
+instead of `$env:LOCALAPPDATA` (PowerShell does not expand `%VAR%`; it would
+create a folder literally named `%LOCALAPPDATA%`).
+
 ## 1. Prerequisites
 
 - Python 3.10+ from python.org. Tick "Add python.exe to PATH" in the installer.
@@ -12,8 +16,9 @@ source patches for Forever. `memwatch.sh` is Linux-only.
 
 ## 2. Get the kit
 
-```
-git clone https://github.com/nezorflame/wow-forever-addon-kit %LOCALAPPDATA%\wow-forever-addon-kit
+```powershell
+git clone https://github.com/nezorflame/wow-forever-addon-kit "$env:LOCALAPPDATA\wow-forever-addon-kit"
+cd "$env:LOCALAPPDATA\wow-forever-addon-kit"
 ```
 
 If WoW is not in the default `C:\Program Files (x86)\World of Warcraft\_classic_beta_`,
@@ -25,10 +30,9 @@ if you have several, set `FOREVER_ACCOUNT` there too.
 
 Log in to the beta once so the SavedVariables exist, exit, then:
 
-```
-cd %LOCALAPPDATA%\wow-forever-addon-kit\tools
-python sv_bridge.py sync --force
-python sv_bridge.py status
+```powershell
+python tools\sv_bridge.py sync --force
+python tools\sv_bridge.py status
 ```
 
 To carry settings over from another PC: copy
@@ -38,26 +42,27 @@ Same Battle.net account = same `<id>#<n>` folder name.
 
 ## 4. Keep the watcher running (survives `/reload`)
 
-Task Scheduler → Create Task:
-- General: run only when user is logged on.
-- Triggers: At log on.
-- Actions: Start a program
-  - Program: `pythonw.exe` (windowless), full path e.g.
-    `C:\Users\<you>\AppData\Local\Programs\Python\Python312\pythonw.exe`
-  - Arguments: `sv_bridge.py watch`
-  - Start in: `%LOCALAPPDATA%\wow-forever-addon-kit\tools`
-- Settings: untick "Stop the task if it runs longer than", tick "If the task fails, restart every 1 minute".
+One command registers a logon task with absolute paths, windowless, auto-restart:
 
-Or simpler: a shortcut in `shell:startup` with the same program, arguments and start-in.
-Run the task once now (right-click → Run). The log is `tools\sv_bridge.log`;
-its first line should say `sv_watch (poll 100 ms) started`.
+```powershell
+powershell -ExecutionPolicy Bypass -File tools\install-windows-task.ps1
+```
+
+It prints the task state and the log tail. The first log line should be
+`sv_watch (poll 100 ms) started`. Remove it later with the same command plus `-Uninstall`.
+
+If you prefer Task Scheduler by hand: program = full path to `pythonw.exe`,
+arguments = full path to `sv_bridge.py` in quotes followed by `watch`, start in =
+the `tools` folder. Untick "Stop the task if it runs longer than", tick restart on
+failure. The task shows nothing on screen; any startup failure (for example no
+WTF account folder yet) is written to `tools\sv_bridge.log`.
 
 ## 5. Addon patches
 
 After installing or updating a patched addon:
-```
-python patch_addons.py --check
-python patch_addons.py
+```powershell
+python tools\patch_addons.py --check
+python tools\patch_addons.py
 ```
 `PATTERN NOT FOUND` on `--check` means the addon changed at that spot; usually the
 author fixed it upstream, so that patch can be dropped.
@@ -71,5 +76,5 @@ author fixed it upstream, so that patch can be dropped.
 
 ## 7. Removing it when Blizzard fixes the client
 
-Delete the scheduled task, delete `Interface\AddOns\!!ForeverCompat`. The patches are
-harmless to leave; addon updates overwrite them anyway.
+`tools\install-windows-task.ps1 -Uninstall`, delete `Interface\AddOns\!!ForeverCompat`.
+The patches are harmless to leave; addon updates overwrite them anyway.
