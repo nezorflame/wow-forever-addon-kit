@@ -129,4 +129,5 @@ leave and disappear with the next addon update anyway.
 
 ## License
 
-MIT. See [LICENSE](LICENSE); portions Copyright (c) 2026 Thunderz, also MIT.
+MIT, see [LICENSE](LICENSE). `addons/ForeverCompat` and the bridge design are
+Copyright (c) 2026 Thunderz under MIT; that notice is reproduced in [NOTICE.md](NOTICE.md).
