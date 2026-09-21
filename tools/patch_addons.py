@@ -8,19 +8,12 @@ Re-run after any addon update (the update overwrites the patched file):
     python3 patch_addons.py --check    report only
 
 Patches:
-  Platynator  Display/Cache.lua
-      LibRangeCheck finds no range spells on Forever (Retail spell tables vs Classic
-      spellbook) so GetHarmMaxChecker() is nil and the "range" state throws
-      "attempt to call a nil value". Treat "no checker" as in range.
-  (Auctionator OrdersPage patch removed: fixed upstream in 337-1-gf2d04d3, 2026-09-18.)
-  (Leatrix_Plus Pet Journal patches removed: code deleted upstream in 1.60.03, 2026-09-20.)
   Baganator Compatibility/BankType.lua
       Baganator hides Blizzard's BankPanel and never selects a bank tab, so
       BankFrame:GetActiveBankType() stays nil. Blizzard's Camelot BankFrame.lua:43
       (OnShowOrHideBagCost, fired on PLAYER_MONEY via "BankPanelMixin.ShowOrHideBagCost")
       passes that nil to C_Bank.FetchNumPurchasedBankTabs and throws. Re-register the
       callback with a nil guard.
-  (Baganator IsAuctionable patch removed: fixed upstream in 827, 2026-09-19.)
   NoAutoClose NoAutoclose.lua
       NoAutoClose blacklists PlayerSpellsFrame from UISpecialFrames (unsafe: protected
       frame) and normally uses a secure Esc handler instead. On Forever that handler is
@@ -66,19 +59,6 @@ else:
 ADDONS = os.path.join(BETA, "Interface", "AddOns")
 
 PATCHES = [
-    {
-        "addon": "Platynator",
-        "file": "Display/Cache.lua",
-        "old": """  ["range"] = function(oldState, unit)
-    local result = addonTable.Display.Utilities.GetRangeChecker()(unit)
-""",
-        "new": """  ["range"] = function(oldState, unit)
-    -- forever-addon-kit patch: LibRangeCheck has no checkers on the Forever beta; treat as in range.
-    local checker = addonTable.Display.Utilities.GetRangeChecker()
-    local result
-    if checker then result = checker(unit) else result = true end
-""",
-    },
     {
         "addon": "Baganator",
         "file": "Compatibility/BankType.lua",

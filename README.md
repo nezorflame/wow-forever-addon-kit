@@ -8,7 +8,7 @@ Three problems, three tools:
 | Problem | Tool |
 |---|---|
 | The beta client **writes** addon SavedVariables but **never reads them back**, so every login and every `/reload` resets every addon to defaults. | `tools/sv_bridge.py` + the `!!ForeverCompat` loader addon |
-| Some addons throw on Forever because it is a Retail-engine client without Retail content (no crafting orders, no Pet Journal, no range spells, ...). | `tools/patch_addons.py` |
+| Some addons throw on Forever because it is a Retail-engine client without Retail content (no crafting orders, no Pet Journal, ...). | `tools/patch_addons.py` |
 | The client's GPU memory grows all session until the frame rate collapses. | `tools/memwatch.sh` (measurement only; the bug is Blizzard's) |
 
 Everything here was measured against the live beta client, build 69913, September 2026.
@@ -84,13 +84,9 @@ Current patches:
 
 | Addon | Why |
 |---|---|
-| Platynator | LibRangeCheck finds no range spells on Forever, so the range checker is nil and nameplates with out-of-range fade or range colour rules throw. Treats "no checker" as in range. |
 | Baganator | Blizzard's Forever `BankFrame.lua` calls `C_Bank.FetchNumPurchasedBankTabs(nil)` when Baganator's bank UI is in use (no Blizzard bank tab selected). Re-registers the callback with a nil guard. |
 | SimpleItemLevel | Forever's `Blizzard_InspectUI` replaced the global `InspectPaperDollFrame_UpdateButtons` with the mixin method `InspectPaperDollFrame:UpdateButtons()`; Retail live still has the global, so the addon calls and hooks it unconditionally and inspecting a player throws. Uses whichever exists. |
 | NoAutoClose | Its secure Esc handler is disabled on Forever (the client's restricted environment is broken), and the fallback pushes the protected `PlayerSpellsFrame` into `UISpecialFrames` despite its own blacklist. Esc in combat then throws `ADDON_ACTION_BLOCKED ... PlayerSpellsFrame:Hide()` blamed on a random addon. The patch leaves that frame to Blizzard. |
-
-Retired (fixed upstream): Auctionator crafting-orders page (337), Baganator auctionable
-check (827), Leatrix Plus Pet Journal hooks (1.60.03).
 
 ## GPU memory growth
 
