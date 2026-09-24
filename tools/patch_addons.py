@@ -20,6 +20,12 @@ Patches:
       disabled ("RE is dead") and the fallback inserts the frame anyway. Esc in combat
       then blocks PlayerSpellsFrame:Hide() from a tainted loop and blames a random
       addon (Chattynator, AtlasLoot, WhatsTraining...). Leave the frame to Blizzard.
+  Syndicator Search/CheckItem.lua
+      Build 70009 renamed item stat strings (ITEM_MOD_MANA_REGENERATION_SHORT ->
+      "Mana regeneration per 5 sec"). On enUS AddKeywordManual asserts that the
+      localised keyword equals the addon's hardcoded English one, so CheckItem.lua
+      aborts, Syndicator.Search never initialises and Baganator's search widget
+      errors on every bag open. On Forever+enUS take the client string as English.
   SimpleItemLevel addon.lua (2 patches)
       Forever's Blizzard_InspectUI replaced the global InspectPaperDollFrame_UpdateButtons
       with the mixin method InspectPaperDollFrame:UpdateButtons(). Retail live still has
@@ -91,6 +97,24 @@ end
 -- forever-addon-kit patch: without the secure esc handler (disabled on Forever) the
 -- blacklisted PlayerSpellsFrame would be pushed into UISpecialFrames; leave it to Blizzard.
 if is4E then ns.ignore.PlayerSpellsFrame = true; end
+""",
+    },
+    {
+        "addon": "Syndicator",
+        "file": "Search/CheckItem.lua",
+        "old": """for s, english in pairs(stats) do
+  local keyword = _G["ITEM_MOD_" .. s .. "_SHORT"] or _G["ITEM_MOD_" .. s]
+  if keyword ~= nil then
+""",
+        "new": """for s, english in pairs(stats) do
+  local keyword = _G["ITEM_MOD_" .. s .. "_SHORT"] or _G["ITEM_MOD_" .. s]
+  -- forever-addon-kit patch: build 70009 renamed stat strings (e.g. ITEM_MOD_MANA_REGENERATION_SHORT
+  -- -> "Mana regeneration per 5 sec"). On enUS AddKeywordManual asserts localised == English, which
+  -- aborts this file and leaves Syndicator.Search (and Baganator's search box) uninitialised.
+  if addonTable.Constants.IsForever and keyword ~= nil and GetLocale() == "enUS" then
+    english = keyword:lower()
+  end
+  if keyword ~= nil then
 """,
     },
     {
