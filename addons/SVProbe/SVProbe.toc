@@ -1,0 +1,6 @@
+## Interface: 16001
+## Title: SVProbe
+## Notes: Probe: does the Forever client load SavedVariables natively? Type /svprobe. Delete this folder when done.
+## SavedVariables: SVProbeAcct
+## SavedVariablesPerCharacter: SVProbeChar
+SVProbe.lua
