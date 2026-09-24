@@ -7,13 +7,12 @@ Tools for running third-party addons on the **World of Warcraft: Forever** beta
 |---|---|
 | Some addons throw on Forever because it is a Retail-engine client without Retail content, or because a beta build renamed something they hardcode. | `tools/patch_addons.py` |
 | The client's GPU memory grows all session until the frame rate collapses. | `tools/memwatch.sh` (measurement only; the bug is Blizzard's) |
-| Did this build fix the "SavedVariables never loaded" bug? | `addons/SVProbe` |
 
 > **History.** Builds 69913–69977 wrote addon SavedVariables but never read them back, so
 > every login reset every addon to defaults. This repo carried a workaround (a loader addon
 > plus a file watcher, derived from Thunderz's forever-addon-kit) until build
-> **1.60.1.70009** (2026-09-24) fixed it. That code is preserved at tag
-> [`sv-bridge-final`](../../tree/sv-bridge-final) in case a later build regresses.
+> **1.60.1.70009** (2026-09-24) fixed it. That code and the `SVProbe` test addon are
+> preserved at tag [`sv-bridge-final`](../../tree/sv-bridge-final) in case a later build regresses.
 
 ## Setup
 
@@ -60,15 +59,9 @@ nil-call errors in *other* addons that consume its API.
 
 ## SavedVariables probe
 
-`addons/SVProbe` is a one-file test addon for the cold-start "settings never load" bug.
-Install it into `Interface/AddOns/SVProbe`, pre-seed
-`WTF/Account/<acct>/SavedVariables/SVProbe.lua` with `SVProbeAcct = {}` and
-`WTF/Account/<acct>/<realmId>/<Char-Realm>/SavedVariables/SVProbe.lua` with
-`SVProbeChar = {}`, cold-start the client and read the chat line (or `/svprobe`). Green
-on both means the client loads SavedVariables itself; red means the bug is back and the
-`sv-bridge-final` tag is the workaround. Delete the addon folder afterwards.
-
-Result log:
+The one-file `SVProbe` addon used to verify the 70009 fix (cold-start, pre-seeded files,
+prints whether the client loaded `SVProbeAcct` / `SVProbeChar` itself) lives at tag
+`sv-bridge-final` under `addons/SVProbe`, next to the bridge it retired. Results:
 
 | Build | Account | Per-character |
 |---|---|---|
