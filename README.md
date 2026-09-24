@@ -1,5 +1,11 @@
 # wow-forever-addon-kit
 
+> **Status 2026-09-25:** beta build **1.60.1.70009** loads SavedVariables natively again
+> (account and per-character, verified with `addons/SVProbe`). The bridge and `!!ForeverCompat`
+> seed loader are no longer needed on that build; `Compat.lua` wrappers and `tools/patch_addons.py`
+> remain useful. See "Removing it" below. Re-run the SVProbe test after any later build bump.
+
+
 Tools for running third-party addons on the **World of Warcraft: Forever** beta
 (build line 1.60.x, interface `16001`), on Linux (Lutris / Proton) and Windows.
 
@@ -103,6 +109,12 @@ Findings on build 69913, D3D12 via vkd3d-proton, RX 9070 XT:
   practical mid-session fix. D3D11 showed no growth over a short test.
 
 ## Removing it
+
+`addons/SVProbe` is a one-file test addon: install it, pre-seed
+`WTF/Account/<acct>/SavedVariables/SVProbe.lua` with `SVProbeAcct = {}` and
+`WTF/Account/<acct>/<realmId>/<Char-Realm>/SavedVariables/SVProbe.lua` with `SVProbeChar = {}`,
+cold-start the client and read the chat line (or `/svprobe`). It clears bridge-seeded globals in
+its main chunk, so a green result can only come from the client's own load.
 
 When a client build reads SavedVariables again: `systemctl --user disable --now
 forever-sv-watch`, delete `Interface/AddOns/!!ForeverCompat`. The patches are harmless to
