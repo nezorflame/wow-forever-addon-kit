@@ -44,12 +44,12 @@ build bump, and the addon's own changelog after an addon update. `PATTERN NOT FO
 `--check` means the addon changed at that spot; so far that has always meant the author
 fixed it upstream, and the patch was dropped from the script.
 
-Current patches:
+Current patches, each with the upstream issue to check before re-applying after an addon update:
 
-| Addon | Why |
-|---|---|
-| SimpleItemLevel | Forever's `Blizzard_InspectUI` replaced the global `InspectPaperDollFrame_UpdateButtons` with the mixin method `InspectPaperDollFrame:UpdateButtons()`; Retail live still has the global, so the addon calls and hooks it unconditionally and inspecting a player throws. Uses whichever exists. |
-| NoAutoClose | Its secure Esc handler is disabled on Forever (the client's restricted environment is broken), and the fallback pushes the protected `PlayerSpellsFrame` into `UISpecialFrames` despite its own blacklist. Esc in combat then throws `ADDON_ACTION_BLOCKED ... PlayerSpellsFrame:Hide()` blamed on a random addon. The patch leaves that frame to Blizzard. |
+| Addon | Upstream issue | Why |
+|---|---|---|
+| SimpleItemLevel | [kemayo/wow-simpleitemlevel#64](https://github.com/kemayo/wow-simpleitemlevel/issues/64) | Forever's `Blizzard_InspectUI` replaced the global `InspectPaperDollFrame_UpdateButtons` with the mixin method `InspectPaperDollFrame:UpdateButtons()`; Retail live still has the global, so the addon calls and hooks it unconditionally and inspecting a player throws. Uses whichever exists. |
+| NoAutoClose | [NumyAddon/NoAutoClose#25](https://github.com/NumyAddon/NoAutoClose/issues/25) | Its secure Esc handler is disabled on Forever (the client's restricted environment is broken), and the fallback pushes the protected `PlayerSpellsFrame` into `UISpecialFrames` despite its own blacklist. Esc in combat then throws `ADDON_ACTION_BLOCKED ... PlayerSpellsFrame:Hide()` blamed on a random addon. The patch leaves that frame to Blizzard. |
 
 Retired patches: Platynator range (author fixed via profile), Syndicator stat keywords on build 70009 (author fixed in v283 within a day), Baganator bank-type nil guard (829-2 shows Blizzard's BankPanel on the live tab, so the nil no longer occurs).
 
