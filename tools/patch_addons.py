@@ -7,12 +7,7 @@ Re-run after any addon update (the update overwrites the patched file):
     python3 patch_addons.py            apply all patches
     python3 patch_addons.py --check    report only
 
-Patches:
-  SimpleItemLevel addon.lua (2 patches)  (reported: https://github.com/kemayo/wow-simpleitemlevel/issues/64)
-      Forever's Blizzard_InspectUI replaced the global InspectPaperDollFrame_UpdateButtons
-      with the mixin method InspectPaperDollFrame:UpdateButtons(). Retail live still has
-      the global, so the addon calls/hooks it unconditionally -> nil call on inspect.
-      Use whichever exists.
+Patches: none at the moment. Add entries to PATCHES as {addon, file, old, new}.
 """
 import os
 import sys
@@ -47,31 +42,6 @@ else:
 ADDONS = os.path.join(BETA, "Interface", "AddOns")
 
 PATCHES = [
-    {
-        "addon": "SimpleItemLevel",  # https://github.com/kemayo/wow-simpleitemlevel/issues/64
-        "file": "addon.lua",
-        "old": """                InspectPaperDollFrame_UpdateButtons()
-""",
-        "new": """                -- forever-addon-kit patch: Forever's InspectUI moved this to a mixin method
-                if InspectPaperDollFrame_UpdateButtons then
-                    InspectPaperDollFrame_UpdateButtons()
-                elseif InspectPaperDollFrame and InspectPaperDollFrame.UpdateButtons then
-                    InspectPaperDollFrame:UpdateButtons()
-                end
-""",
-    },
-    {
-        "addon": "SimpleItemLevel",  # https://github.com/kemayo/wow-simpleitemlevel/issues/64
-        "file": "addon.lua",
-        "old": """    hooksecurefunc("InspectPaperDollFrame_UpdateButtons", function()
-""",
-        "new": """    -- forever-addon-kit patch: Forever's InspectUI moved this to a mixin method
-    local hookInspectUpdateButtons = InspectPaperDollFrame_UpdateButtons
-        and function(fn) hooksecurefunc("InspectPaperDollFrame_UpdateButtons", fn) end
-        or function(fn) hooksecurefunc(InspectPaperDollFrame, "UpdateButtons", fn) end
-    hookInspectUpdateButtons(function()
-""",
-    },
 ]
 
 

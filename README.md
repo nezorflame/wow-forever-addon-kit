@@ -38,11 +38,9 @@ find out, read the Blizzard file the patch works around in Blizzard's Forever UI
 build bump, and the addon's own changelog after an addon update. `PATTERN NOT FOUND` on
 `--check` means the addon changed at that spot, usually an upstream fix: drop the entry.
 
-Current patches, each with the upstream issue to check before re-applying after an addon update:
-
-| Addon | Upstream issue | Why |
-|---|---|---|
-| SimpleItemLevel | [kemayo/wow-simpleitemlevel#64](https://github.com/kemayo/wow-simpleitemlevel/issues/64) | Forever's `Blizzard_InspectUI` replaced the global `InspectPaperDollFrame_UpdateButtons` with the mixin method `InspectPaperDollFrame:UpdateButtons()`; Retail live still has the global, so the addon calls and hooks it unconditionally and inspecting a player throws. Uses whichever exists. |
+No patches are active right now: every addon reported so far has shipped its own fix.
+The list lives in `PATCHES` in `tools/patch_addons.py`, each entry with the upstream issue to
+check before re-applying after an addon update.
 
 ## Credits
 
