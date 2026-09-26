@@ -8,11 +8,8 @@ Tools for running third-party addons on the **World of Warcraft: Forever** beta
 | Some addons throw on Forever because it is a Retail-engine client without Retail content, or because a beta build renamed something they hardcode. | `tools/patch_addons.py` |
 | The client's GPU memory grows all session until the frame rate collapses. | `tools/memwatch.sh` (measurement only; the bug is Blizzard's) |
 
-> **History.** Builds 69913–69977 wrote addon SavedVariables but never read them back, so
-> every login reset every addon to defaults. This repo carried a workaround (a loader addon
-> plus a file watcher, derived from Thunderz's forever-addon-kit) until build
-> **1.60.1.70009** (2026-09-24) fixed it. That code and the `SVProbe` test addon are
-> preserved at tag [`sv-bridge-final`](../../tree/sv-bridge-final) in case a later build regresses.
+The SavedVariables bridge and the `SVProbe` test addon, retired when build 1.60.1.70009 fixed
+the bug, are at tag `sv-bridge-final`.
 
 ## Setup
 
@@ -41,8 +38,7 @@ python3 tools/patch_addons.py           # apply
 find out, read the Blizzard file the patch works around in Blizzard's Forever UI source
 ([Gethe/wow-ui-source](https://github.com/Gethe/wow-ui-source), branch `forever`) after a
 build bump, and the addon's own changelog after an addon update. `PATTERN NOT FOUND` on
-`--check` means the addon changed at that spot; so far that has always meant the author
-fixed it upstream, and the patch was dropped from the script.
+`--check` means the addon changed at that spot, usually an upstream fix: drop the entry.
 
 Current patches, each with the upstream issue to check before re-applying after an addon update:
 
@@ -50,23 +46,6 @@ Current patches, each with the upstream issue to check before re-applying after 
 |---|---|---|
 | SimpleItemLevel | [kemayo/wow-simpleitemlevel#64](https://github.com/kemayo/wow-simpleitemlevel/issues/64) | Forever's `Blizzard_InspectUI` replaced the global `InspectPaperDollFrame_UpdateButtons` with the mixin method `InspectPaperDollFrame:UpdateButtons()`; Retail live still has the global, so the addon calls and hooks it unconditionally and inspecting a player throws. Uses whichever exists. |
 | NoAutoClose | [NumyAddon/NoAutoClose#25](https://github.com/NumyAddon/NoAutoClose/issues/25) | Its secure Esc handler is disabled on Forever (the client's restricted environment is broken), and the fallback pushes the protected `PlayerSpellsFrame` into `UISpecialFrames` despite its own blacklist. Esc in combat then throws `ADDON_ACTION_BLOCKED ... PlayerSpellsFrame:Hide()` blamed on a random addon. The patch leaves that frame to Blizzard. |
-
-Retired patches: Platynator range (author fixed via profile), Syndicator stat keywords on build 70009 (author fixed in v283 within a day), Baganator bank-type nil guard (829-2 shows Blizzard's BankPanel on the live tab, so the nil no longer occurs).
-
-Lesson from the Syndicator case: when a new build lands, addons that assert
-`localised == English` break on enUS clients first, and one aborted main chunk shows up as
-nil-call errors in *other* addons that consume its API.
-
-## SavedVariables probe
-
-The one-file `SVProbe` addon used to verify the 70009 fix (cold-start, pre-seeded files,
-prints whether the client loaded `SVProbeAcct` / `SVProbeChar` itself) lives at tag
-`sv-bridge-final` under `addons/SVProbe`, next to the bridge it retired. Results:
-
-| Build | Account | Per-character |
-|---|---|---|
-| 1.60.1.69977 | nil | (not tested) |
-| 1.60.1.70009 | loaded | loaded |
 
 ## GPU memory growth
 
@@ -94,8 +73,7 @@ degradation" as fixed (worded for Mac). Not yet re-measured here on 70009.
   Platynator, Auctionator, Chattynator. The patches here are stopgaps; the author has
   been shipping Forever fixes within a day of reports.
 - **[Gethe/wow-ui-source](https://github.com/Gethe/wow-ui-source)**, branch `forever`:
-  Blizzard's Forever UI source (`Blizzard_UIPanels_Game/Camelot`), used to diagnose the
-  bank frame crash and to check after each build whether a patch is still needed.
+  Blizzard's Forever UI source, used to check after each build whether a patch is still needed.
 - **[danielcosta42/guildos](https://github.com/danielcosta42/guildos)**: independent
   confirmation of the SavedVariables bug.
 - **[HansKristian-Work/vkd3d-proton](https://github.com/HansKristian-Work/vkd3d-proton)**
