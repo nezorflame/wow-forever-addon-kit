@@ -5,8 +5,6 @@ forever.env
 sv-backups/
 
 # Runtime output
-tools/memwatch.csv
-tools/gxlogs/
 
 # Python
 __pycache__/
