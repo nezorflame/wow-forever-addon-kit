@@ -6,7 +6,7 @@ Tools for running third-party addons on the **World of Warcraft: Forever** beta
 | Problem | Tool |
 |---|---|
 | Some addons throw on Forever because it is a Retail-engine client without Retail content, or because a beta build renamed something they hardcode. | `tools/patch_addons.py` |
-| The client's GPU memory grows all session until the frame rate collapses. | `tools/memwatch.sh` (measurement only; the bug is Blizzard's) |
+| Measure the client's memory and GPU use over a session (used to confirm the 1.60.1 VRAM growth, fixed in build 70009). | `tools/memwatch.sh` |
 
 The SavedVariables bridge and the `SVProbe` test addon, retired when build 1.60.1.70009 fixed
 the bug, are at tag `sv-bridge-final`.
@@ -54,15 +54,9 @@ memory, card-wide and **per-process** VRAM (DRM fdinfo), GPU busy, clocks and po
 also archives the client's `Logs/gx.log` on exit, because that file is overwritten per
 session and contains the game's own "Periodic Gpu Status Report: Mem Budget" line.
 
-Findings on build 69913, D3D12 via vkd3d-proton, RX 9070 XT:
-- Resident GPU memory grows ~40–70 MB/min for the whole session, linearly, no plateau.
-- The game's own budget report and the driver's per-process figure agree, so it is the
-  engine's own resource residency, not the translation layer.
-- `/console gxRestart` releases it (a 2 s hiccup) and restores the frame rate. That is the
-  practical mid-session fix. D3D11 showed no growth over a short test.
-
-Blizzard's 2026-09-24 development notes list "a memory leak causing gradual performance
-degradation" as fixed (worded for Mac). Not yet re-measured here on 70009.
+Builds up to 69977 grew resident GPU memory ~40–70 MB/min all session (engine residency,
+not vkd3d-proton; `/console gxRestart` released it). Build 70009 fixed it; the sampler
+stays for the next regression.
 
 ## Credits
 
