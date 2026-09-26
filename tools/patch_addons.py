@@ -8,12 +8,6 @@ Re-run after any addon update (the update overwrites the patched file):
     python3 patch_addons.py --check    report only
 
 Patches:
-  Baganator Compatibility/BankType.lua
-      Baganator hides Blizzard's BankPanel and never selects a bank tab, so
-      BankFrame:GetActiveBankType() stays nil. Blizzard's Camelot BankFrame.lua:43
-      (OnShowOrHideBagCost, fired on PLAYER_MONEY via "BankPanelMixin.ShowOrHideBagCost")
-      passes that nil to C_Bank.FetchNumPurchasedBankTabs and throws. Re-register the
-      callback with a nil guard.
   NoAutoClose NoAutoclose.lua
       NoAutoClose blacklists PlayerSpellsFrame from UISpecialFrames (unsafe: protected
       frame) and normally uses a secure Esc handler instead. On Forever that handler is
@@ -59,29 +53,6 @@ else:
 ADDONS = os.path.join(BETA, "Interface", "AddOns")
 
 PATCHES = [
-    {
-        "addon": "Baganator",
-        "file": "Compatibility/BankType.lua",
-        "old": """function Addon_SetBankType(type)
-end
-""",
-        "new": """function Addon_SetBankType(type)
-end
-
--- forever-addon-kit patch: Blizzard's BankFrameMixin:OnShowOrHideBagCost (Camelot
--- BankFrame.lua:43) calls C_Bank.FetchNumPurchasedBankTabs(self:GetActiveBankType())
--- with no nil guard. With Baganator's bank UI the Blizzard tabs are never selected,
--- so the type is nil and PLAYER_MONEY throws. Replace the callback with a guarded one.
-if addonTable.Constants.IsForever and BankFrame and BankFrameMixin and BankFrameMixin.OnShowOrHideBagCost and EventRegistry then
-  EventRegistry:UnregisterCallback("BankPanelMixin.ShowOrHideBagCost", BankFrame)
-  EventRegistry:RegisterCallback("BankPanelMixin.ShowOrHideBagCost", function()
-    if BankFrame.GetActiveBankType and BankFrame:GetActiveBankType() ~= nil then
-      BankFrameMixin.OnShowOrHideBagCost(BankFrame)
-    end
-  end, BankFrame)
-end
-""",
-    },
     {
         "addon": "NoAutoClose",
         "file": "NoAutoclose.lua",

@@ -48,11 +48,10 @@ Current patches:
 
 | Addon | Why |
 |---|---|
-| Baganator | Blizzard's Forever `Camelot/BankFrame.lua:43` calls `C_Bank.FetchNumPurchasedBankTabs(nil)` when Baganator's bank UI is in use (no Blizzard bank tab selected), so `PLAYER_MONEY` throws. Re-registers the callback with a nil guard. |
 | SimpleItemLevel | Forever's `Blizzard_InspectUI` replaced the global `InspectPaperDollFrame_UpdateButtons` with the mixin method `InspectPaperDollFrame:UpdateButtons()`; Retail live still has the global, so the addon calls and hooks it unconditionally and inspecting a player throws. Uses whichever exists. |
 | NoAutoClose | Its secure Esc handler is disabled on Forever (the client's restricted environment is broken), and the fallback pushes the protected `PlayerSpellsFrame` into `UISpecialFrames` despite its own blacklist. Esc in combat then throws `ADDON_ACTION_BLOCKED ... PlayerSpellsFrame:Hide()` blamed on a random addon. The patch leaves that frame to Blizzard. |
 
-Retired patches: Platynator range (author fixed via profile), Syndicator stat keywords on build 70009 (author fixed in v283 within a day).
+Retired patches: Platynator range (author fixed via profile), Syndicator stat keywords on build 70009 (author fixed in v283 within a day), Baganator bank-type nil guard (829-2 shows Blizzard's BankPanel on the live tab, so the nil no longer occurs).
 
 Lesson from the Syndicator case: when a new build lands, addons that assert
 `localised == English` break on enUS clients first, and one aborted main chunk shows up as
